@@ -61,6 +61,12 @@ Polymer Basket Element
             return this._demoGenerator(5);
           },
         },
+        _priceFormatterCache: {
+            type: Object,
+            value: function () {
+                return {};
+            }
+        }
       },
       _demoGenerator: function (size) {
         var arr = [];
@@ -88,11 +94,15 @@ Polymer Basket Element
        * @returns formatted price
        */
       _priceFormatter: function (currency) {
-        var formatter = new Intl.NumberFormat('fr-FR', {
-          style: 'currency',
-          currency: currency,
-          minimumFractionDigits: 2,
-        });
+          var formatter = this._priceFormatterCache[currency];
+          if (!formatter) {
+               formatter = new Intl.NumberFormat('fr-FR', {
+                  style: 'currency',
+                  currency: currency,
+                  minimumFractionDigits: 2,
+              });
+              this._priceFormatterCache[currency] = formatter;
+          }
         return formatter;
       },
         /**
@@ -105,8 +115,13 @@ Polymer Basket Element
           return formatter.format(price.amount);
       },
 
-      sumPrice: function (prices) {
-
+      _computeTotalAmount: function (orderItems) {
+          orderItems.reduce(function (acc, price) {
+              if (!acc.currency) {
+                  acc.currency = price.currency;
+              }
+             acc.amount += price.amount;
+          }, {amount: 0});
       },
 
     });
