@@ -1,5 +1,9 @@
 <link rel="import" href="../polymer/polymer.html">
 
+<link rel="import" href="../iron-list/iron-list.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
+
+
 <!--
 `tt-basket`
 Polymer Basket Element
@@ -11,10 +15,34 @@ Polymer Basket Element
   <template>
     <style>
       :host {
-        display: block;
+        display:block;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
       }
+
+      iron-list {
+        flex: 1 1 auto;
+      }
+
+      iron-list {
+        --iron-list-items-container: {
+          margin: 10px;
+        };
+      }
+
+
     </style>
-    <h2>Hello [[prop1]]</h2>
+
+    <iron-list id="list" items="[[orderItems]]" as="item" on-tap="_handleOnTapOffer">
+      <template>
+        <div id="offerItemContainer" style="padding: 5px">
+            [[item.product.name]]  [[priceFormatter(item.price)]]
+        </div>
+      </template>
+    </iron-list>
+
+
   </template>
 
   <script>
@@ -23,10 +51,42 @@ Polymer Basket Element
       is: 'tt-basket',
 
       properties: {
-        prop1: {
-          type: String,
-          value: 'tt-basket',
+        orderItems: {
+          type: Array,
+          value: function () {
+            return this.demoGenerator(5);
+          },
         },
+      },
+      demoGenerator: function (size) {
+        var arr = [];
+        for (var pas = 1; pas <= size; pas++) {
+          arr.push({
+            id: 'o'+pas,
+            price: 24,
+            currency: '€',
+            quantity: 1,
+            product: {
+              id: 'p' + pas,
+              name: 'Product ' + pas
+            }
+          });
+        }
+        return arr;
+      },
+      /**
+       *
+       * @param price
+       * @param currency http://www.currency-iso.org/en/home/tables/table-a1.html
+       * @returns formatted price
+       */
+      priceFormatter: function (price, currency) {
+        var formatter = new Intl.NumberFormat('fr-FR', {
+          style: 'currency',
+          currency: 'EUR',
+          minimumFractionDigits: 2,
+        });
+        return formatter.format(price);
       },
 
     });

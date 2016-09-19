@@ -12,6 +12,15 @@
     <link rel="import" href="../tt-basket.html">
 
     <style is="custom-style" include="demo-pages-shared-styles">
+      demo-snippet {
+        --demo-snippet: {
+          max-width: 800px;
+          width: 800px;
+          margin-left: auto;
+          margin-right: auto;
+        }
+      }
+
     </style>
   </head>
   <body>
@@ -19,9 +28,28 @@
     <div class="vertical-section-container centered">
       <h3>Basic tt-basket Demo</h3>
       <demo-snippet>
-        <template>
+        <template is="dom-bind" id="demo">
           <tt-basket></tt-basket>
         </template>
+        <script>
+          var demo = document.querySelector('#demo');
+          var generator = function (size) {
+            var arr = [];
+            for (var pas = 1; pas < size; pas++) {
+              arr.push({
+                id: 'o'+pas,
+                price: 24,
+                quantity: 1,
+                product: {
+                  id: 'p' + pas,
+                  name: 'Product ' + pas
+                }
+              });
+            }
+            return arr;
+          };
+          demo.orderItems = generator();
+        </script>
       </demo-snippet>
     </div>
 
