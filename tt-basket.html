@@ -13,7 +13,7 @@ Polymer Basket Element
 
 <dom-module id="tt-basket">
   <template>
-    <style>
+    <style  is="custom-style" include="iron-flex iron-flex-alignment">
       :host {
         display:block;
         height: 100vh;
@@ -27,17 +27,21 @@ Polymer Basket Element
 
       iron-list {
         --iron-list-items-container: {
-          margin: 10px;
+          margin: 1px;
         };
       }
 
+     .orderItem {
+         @apply(--layout-horizontal);
+     }
 
     </style>
 
-    <iron-list id="list" items="[[orderItems]]" as="item" on-tap="_handleOnTapOffer">
+    <iron-list id="list" items="[[orderItems]]" as="item" on-tap="_handleOnTapOrderItem">
       <template>
-        <div id="offerItemContainer" style="padding: 5px">
-            [[item.product.name]]  [[priceFormatter(item.price)]]
+        <div class="orderItem" tabindex$="[[tabIndex]]">
+            <div class="flex">[[item.product.name]]</div>
+            <div>[[priceFormatter(item.price)]]</div>
         </div>
       </template>
     </iron-list>
@@ -63,8 +67,11 @@ Polymer Basket Element
         for (var pas = 1; pas <= size; pas++) {
           arr.push({
             id: 'o'+pas,
-            price: 24,
-            currency: '€',
+            price: {
+                currency: 'EUR',
+                amount: (24 * Math.random()).toFixed(2)
+            },
+            currency: 'EUR',
             quantity: 1,
             product: {
               id: 'p' + pas,
@@ -83,10 +90,10 @@ Polymer Basket Element
       priceFormatter: function (price, currency) {
         var formatter = new Intl.NumberFormat('fr-FR', {
           style: 'currency',
-          currency: 'EUR',
+          currency: price.currency,
           minimumFractionDigits: 2,
         });
-        return formatter.format(price);
+        return formatter.format(price.amount);
       },
 
     });
