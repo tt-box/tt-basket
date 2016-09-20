@@ -3,6 +3,7 @@
 <link rel="import" href="../iron-list/iron-list.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
 
+<link rel="import" href="../tt-price/tt-price.html">
 
 <!--
 `tt-basket`
@@ -12,118 +13,88 @@ Polymer Basket Element
 -->
 
 <dom-module id="tt-basket">
-  <template>
-    <style  is="custom-style" include="iron-flex iron-flex-alignment">
-      :host {
-        display:block;
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-      }
+    <template>
+        <style is="custom-style" include="iron-flex iron-flex-alignment">
+            :host {
+                display: block;
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+            }
 
-      iron-list {
-        flex: 1 1 auto;
-      }
+            iron-list {
+                flex: 1 1 auto;
+            }
 
-      iron-list {
-        --iron-list-items-container: {
-          margin: 1px;
-        };
-      }
+            iron-list {
+                --iron-list-items-container: {
+                    margin: 1px;
+                };
+            }
 
-     .orderItem {
-         @apply(--layout-horizontal);
-     }
+            .orderItem {
+                @apply(--layout-horizontal);
+            }
 
-    </style>
+        </style>
 
-    <iron-list id="list" items="[[orderItems]]" as="item" on-tap="_handleOnTapOrderItem">
-      <template>
-        <div class="orderItem" tabindex$="[[tabIndex]]">
-            <div class="flex">[[item.product.name]]</div>
-            <div>[[_formatPrice(item.price)]]</div>
+        <iron-list id="list" items="[[orderItems]]" as="item" on-tap="_handleOnTapOrderItem">
+            <template>
+                <div class="orderItem" tabindex$="[[tabIndex]]">
+                    <div class="flex">[[item.product.name]]</div>
+                    <tt-price price="[[item.price]]"></tt-price>
+                </div>
+            </template>
+        </iron-list>
+
+        <div>
+            <div>Total</div>
+            <div>
+                <tt-price price="[[total]]"></tt-price>
+            </div>
         </div>
-      </template>
-    </iron-list>
 
+    </template>
 
-  </template>
+    <script>
+        Polymer({
 
-  <script>
-    Polymer({
+            is: 'tt-basket',
 
-      is: 'tt-basket',
-
-      properties: {
-        orderItems: {
-          type: Array,
-          value: function () {
-            return this._demoGenerator(5);
-          },
-        },
-        _priceFormatterCache: {
-            type: Object,
-            value: function () {
-                return {};
-            }
-        }
-      },
-      _demoGenerator: function (size) {
-        var arr = [];
-        for (var pas = 1; pas <= size; pas++) {
-          arr.push({
-            id: 'o'+pas,
-            price: {
-                currency: 'EUR',
-                amount: (24 * Math.random()).toFixed(2)
+            properties: {
+                orderItems: {
+                    type: Array,
+                    value: function () {
+                        return {};
+                    },
+                },
+                total: {
+                    type: Object,
+                    computed: '_computeTotalAmount(orderItems)'
+                }
             },
-            currency: 'EUR',
-            quantity: 1,
-            product: {
-              id: 'p' + pas,
-              name: 'Product ' + pas
+
+
+            _computeTotalAmount: function (orderItems) {
+                var prices = orderItems.map(function (item) {
+                    return item.price;
+                });
+                var total = this._computeSumPrice(prices);
+                return total;
+            },
+
+            _computeSumPrice: function (prices) {
+                var totalPrice = prices.reduce(function (acc, price) {
+                    if (!acc.currency) {
+                        acc.currency = price.currency;
+                    }
+                    acc.amount = acc.amount + price.amount;
+                    console.log('acc ', acc, 'price', price);
+                    return acc;
+                }, {amount: 0});
+                return totalPrice;
             }
-          });
-        }
-        return arr;
-      },
-      /**
-       *
-       * @param price
-       * @param currency http://www.currency-iso.org/en/home/tables/table-a1.html
-       * @returns formatted price
-       */
-      _priceFormatter: function (currency) {
-          var formatter = this._priceFormatterCache[currency];
-          if (!formatter) {
-               formatter = new Intl.NumberFormat('fr-FR', {
-                  style: 'currency',
-                  currency: currency,
-                  minimumFractionDigits: 2,
-              });
-              this._priceFormatterCache[currency] = formatter;
-          }
-        return formatter;
-      },
-        /**
-         * Format the Price
-         * @param price with format { amount: 24.01, currency: 'EUR' }
-         * @returns The formatted price with currency
-         */
-      _formatPrice: function (price) {
-          var formatter = this._priceFormatter(price.currency);
-          return formatter.format(price.amount);
-      },
 
-      _computeTotalAmount: function (orderItems) {
-          orderItems.reduce(function (acc, price) {
-              if (!acc.currency) {
-                  acc.currency = price.currency;
-              }
-             acc.amount += price.amount;
-          }, {amount: 0});
-      },
-
-    });
-  </script>
+        });
+    </script>
 </dom-module>

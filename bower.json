@@ -5,7 +5,8 @@
   "dependencies": {
     "polymer": "Polymer/polymer#^1.4.0",
     "iron-list": "PolymerElements/iron-list#^1.3.9",
-    "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.3.1"
+    "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.3.1",
+    "tt-price": "tt-box/tt-price"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",

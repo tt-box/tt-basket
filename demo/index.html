@@ -28,7 +28,7 @@
       <h3>Basic tt-basket Demo</h3>
       <demo-snippet>
         <template is="dom-bind" id="demo">
-          <tt-basket></tt-basket>
+          <tt-basket order-items="[[orderItems]]"></tt-basket>
         </template>
         <script>
           var demo = document.querySelector('#demo');
@@ -37,7 +37,11 @@
             for (var pas = 1; pas < size; pas++) {
               arr.push({
                 id: 'o'+pas,
-                price: 24,
+                price: {
+                  currency: 'EUR',
+                  amount: Number((24 * Math.random()*100).toFixed(0))
+                },
+                currency: 'EUR',
                 quantity: 1,
                 product: {
                   id: 'p' + pas,
@@ -47,7 +51,7 @@
             }
             return arr;
           };
-          demo.orderItems = generator();
+          demo.orderItems = generator(10);
         </script>
       </demo-snippet>
     </div>
