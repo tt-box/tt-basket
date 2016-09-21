@@ -34,12 +34,12 @@
           var demo = document.querySelector('#demo');
           var generator = function (size) {
             var arr = [];
-            for (var pas = 1; pas < size; pas++) {
+            for (var pas = 1; pas <= size; pas++) {
               arr.push({
                 id: 'o'+pas,
                 price: {
                   currency: 'EUR',
-                  amount: Number((24 * Math.random()*100).toFixed(0))
+                  cent: Number((24 * Math.random()*100).toFixed(0))
                 },
                 currency: 'EUR',
                 quantity: 1,
@@ -51,7 +51,7 @@
             }
             return arr;
           };
-          demo.orderItems = generator(10);
+          demo.orderItems = generator(3);
         </script>
       </demo-snippet>
     </div>

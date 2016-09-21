@@ -3,6 +3,7 @@
 <link rel="import" href="../iron-list/iron-list.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
 
+<link rel="import" href="../iron-swipeable-container/iron-swipeable-container.html">
 <link rel="import" href="../tt-price/tt-price.html">
 
 <!--
@@ -16,14 +17,14 @@ Polymer Basket Element
     <template>
         <style is="custom-style" include="iron-flex iron-flex-alignment">
             :host {
-                display: block;
-                height: 100vh;
                 display: flex;
                 flex-direction: column;
+                height: 200px;
             }
 
             iron-list {
                 flex: 1 1 auto;
+                margin-top: 10px;
             }
 
             iron-list {
@@ -36,23 +37,36 @@ Polymer Basket Element
                 @apply(--layout-horizontal);
             }
 
+            .totalContainer {
+                @apply(--layout-horizontal);
+            }
+
+            .swipe {
+                -moz-user-select: none;
+                -ms-user-select: none;
+                -webkit-user-select: none;
+                user-select: none;
+                cursor: default;
+            }
+
         </style>
-
-        <iron-list id="list" items="[[orderItems]]" as="item" on-tap="_handleOnTapOrderItem">
-            <template>
-                <div class="orderItem" tabindex$="[[tabIndex]]">
-                    <div class="flex">[[item.product.name]]</div>
-                    <tt-price price="[[item.price]]"></tt-price>
-                </div>
-            </template>
-        </iron-list>
-
-        <div>
-            <div>Total</div>
+        <div class="totalContainer">
+            <div class="flex">Total</div>
             <div>
                 <tt-price price="[[total]]"></tt-price>
             </div>
         </div>
+        <iron-list id="list" items="[[orderItems]]" as="item" on-tap="_handleOnTapOrderItem">
+            <template>
+                <iron-swipeable-container swipeStyle="curve" on-iron-swipe="_handleOrderSwipe">
+                    <div class="orderItem swipe" tabindex$="[[tabIndex]]">
+                        <div class="flex">[[item.product.name]]</div>
+                        <tt-price price="[[item.price]]"></tt-price>
+                    </div>
+                </iron-swipeable-container>
+            </template>
+        </iron-list>
+
 
     </template>
 
@@ -67,15 +81,28 @@ Polymer Basket Element
                     value: function () {
                         return {};
                     },
+                    notify: true
                 },
                 total: {
                     type: Object,
-                    computed: '_computeTotalAmount(orderItems)'
+                    value: function () {
+                        return {cente: 0, currency: 'EUR'};
+                    },
+                    notify: true
                 }
             },
 
-
-            _computeTotalAmount: function (orderItems) {
+            observers: [
+                '_handleOrderItemsSplices(orderItems.splices)'
+            ],
+            _handleOrderItemsSplices: function (e) {
+                console.log(e);
+                this.async(function () {
+                    this.total = this._computeTotalAmount(this.orderItems);
+                }, 600);
+            },
+            _computeTotalAmount: function (orderItemsEvent) {
+                var orderItems = orderItemsEvent;//.base;
                 var prices = orderItems.map(function (item) {
                     return item.price;
                 });
@@ -88,11 +115,19 @@ Polymer Basket Element
                     if (!acc.currency) {
                         acc.currency = price.currency;
                     }
-                    acc.amount = acc.amount + price.amount;
-                    console.log('acc ', acc, 'price', price);
+                    console.log('sum ', acc.cent, '+', price.cent, '=', (acc.cent + price.cent));
+                    acc.cent = acc.cent + price.cent;
+                    //console.log('acc ', acc, 'price', price);
                     return acc;
-                }, {amount: 0});
+                }, {cent: 0, currency: 'EUR'});
                 return totalPrice;
+            },
+
+
+            _handleOrderSwipe: function (e) {
+                e.stopPropagation();
+                console.log("Swipe", e);
+                this.splice('orderItems', e.model.index, 1);
             }
 
         });
