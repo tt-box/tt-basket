@@ -1,0 +1,123 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<link rel="import" href="../iron-list/iron-list.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
+
+<link rel="import" href="../iron-swipeable-container/iron-swipeable-container.html">
+
+
+<!--
+`bug-multiswipe-singleevent`
+Polymer Bug Swipe Demonstration
+
+@demo demo/index.html 
+-->
+
+<dom-module id="bug-multiswipe-singleevent">
+    <template>
+        <style is="custom-style" include="iron-flex iron-flex-alignment">
+            :host {
+                display: flex;
+                flex-direction: column;
+                height: 200px;
+            }
+
+            iron-list {
+                flex: 1 1 auto;
+                margin-top: 10px;
+            }
+
+            iron-list {
+                --iron-list-items-container: {
+                    margin: 1px;
+                };
+            }
+
+            .itemContainer {
+                @apply(--layout-horizontal);
+            }
+
+            .totalContainer {
+                @apply(--layout-horizontal);
+            }
+
+            .swipe {
+                -moz-user-select: none;
+                -ms-user-select: none;
+                -webkit-user-select: none;
+                user-select: none;
+                cursor: default;
+            }
+
+        </style>
+        <div class="totalContainer">
+            <div class="flex">Total</div>
+            <div>[[total]]</div>
+        </div>
+        <iron-list id="list" items="[[items]]" as="item">
+            <template>
+                <iron-swipeable-container  on-iron-swipe="_handleSwipe">
+                    <div class="itemContainer swipe" tabindex$="[[tabIndex]]">
+                        <div class="flex">[[item.name]]</div>
+                        <div>[[item.quantity]]</div>
+                    </div>
+                </iron-swipeable-container>
+            </template>
+        </iron-list>
+
+
+    </template>
+
+    <script>
+        Polymer({
+
+            is: 'bug-multiswipe-singleevent',
+
+            properties: {
+                items: {
+                    type: Array,
+                    value: function () {
+                        return this.generator(5);
+                    },
+                    notify: true
+                },
+                total: {
+                    type: Number,
+                    computed: '_computeTotalAmount(items.*)',
+                    notify: true
+                }
+            },
+
+
+            generator: function (size) {
+                var arr = [];
+                for (var pas = 1; pas <= size; pas++) {
+                    arr.push({
+                        id: pas,
+                        quantity: Number((10 * Math.random()).toFixed(0))+1,
+                        name: 'Item Num ' + pas
+                    });
+                }
+                return arr;
+            },
+
+            _computeTotalAmount: function (itemsEvent) {
+                console.log('compute total with event',  itemsEvent);
+                var items = itemsEvent.base;
+                var totalPrice = items.reduce(function (acc, item) {
+                    acc = acc + item.quantity;
+                    //console.log('acc ', acc, 'with add quantity', item.quantity);
+                    return acc;
+                }, 0);
+                return totalPrice;
+            },
+
+
+            _handleSwipe: function (e) {
+                console.log("Handle Swipe", e);
+                this.splice('items', e.model.index, 1);
+            }
+
+        });
+    </script>
+</dom-module>

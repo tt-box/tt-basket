@@ -35,6 +35,7 @@ Polymer Basket Element
 
             .orderItem {
                 @apply(--layout-horizontal);
+                height: 32px;
             }
 
             .totalContainer {
@@ -56,14 +57,14 @@ Polymer Basket Element
                 <tt-price price="[[total]]"></tt-price>
             </div>
         </div>
-        <iron-list id="list" items="[[orderItems]]" as="item" on-tap="_handleOnTapOrderItem">
+        <iron-list id="list" items="[[orderItems]]" as="item">
             <template>
-                <iron-swipeable-container swipeStyle="curve" on-iron-swipe="_handleOrderSwipe">
-                    <div class="orderItem swipe" tabindex$="[[tabIndex]]">
+                <!--<iron-swipeable-container  on-iron-swipe="_handleOrderSwipe">-->
+                    <div class="orderItem swipe" tabindex$="[[tabIndex]]" on-dbtap="_handleDoubleTap" on-tap="_handleTap">
                         <div class="flex">[[item.product.name]]</div>
                         <tt-price price="[[item.price]]"></tt-price>
                     </div>
-                </iron-swipeable-container>
+                <!--</iron-swipeable-container>-->
             </template>
         </iron-list>
 
@@ -80,29 +81,16 @@ Polymer Basket Element
                     type: Array,
                     value: function () {
                         return {};
-                    },
-                    notify: true
+                    }
                 },
                 total: {
                     type: Object,
-                    value: function () {
-                        return {cente: 0, currency: 'EUR'};
-                    },
-                    notify: true
+                    computed: '_computeTotal(orderItems.*)'
                 }
             },
 
-            observers: [
-                '_handleOrderItemsSplices(orderItems.splices)'
-            ],
-            _handleOrderItemsSplices: function (e) {
-                console.log(e);
-                this.async(function () {
-                    this.total = this._computeTotalAmount(this.orderItems);
-                }, 600);
-            },
-            _computeTotalAmount: function (orderItemsEvent) {
-                var orderItems = orderItemsEvent;//.base;
+            _computeTotal: function (orderItemsEvent) {
+                var orderItems = orderItemsEvent.base;
                 var prices = orderItems.map(function (item) {
                     return item.price;
                 });
@@ -128,6 +116,14 @@ Polymer Basket Element
                 e.stopPropagation();
                 console.log("Swipe", e);
                 this.splice('orderItems', e.model.index, 1);
+            },
+
+            _handleTap: function (e) {
+                console.log('Tap', e);
+            },
+
+            _handleDoubleTap: function (e) {
+                console.log('Double Tap', e);
             }
 
         });
