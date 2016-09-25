@@ -57,7 +57,7 @@ Polymer Basket Element
                 <tt-price price="[[total]]"></tt-price>
             </div>
         </div>
-        <iron-list id="list" items="[[orderItems]]" as="item">
+        <iron-list id="list" items="[[orderItems]]" as="item" selectionEnabled selectedItems="{{selectedItems}}">
             <template>
                 <!--<iron-swipeable-container  on-iron-swipe="_handleOrderSwipe">-->
                     <div class="orderItem swipe" tabindex$="[[tabIndex]]" on-dbtap="_handleDoubleTap" on-tap="_handleTap">
@@ -82,6 +82,10 @@ Polymer Basket Element
                     value: function () {
                         return {};
                     }
+                },
+                selectedItems: {
+                  type: Array,
+                    notify: true
                 },
                 total: {
                     type: Object,
@@ -124,7 +128,12 @@ Polymer Basket Element
 
             _handleDoubleTap: function (e) {
                 console.log('Double Tap', e);
-            }
+            },
+
+            addToCart: function(item) {
+                this.push('orderItems', item);
+            },
+
 
         });
     </script>
