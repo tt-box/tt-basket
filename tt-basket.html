@@ -80,16 +80,20 @@ Polymer Basket Element
                 orderItems: {
                     type: Array,
                     value: function () {
-                        return {};
+                        return [];
                     }
                 },
                 selectedItems: {
                   type: Array,
+                    value: function () {
+                        return [];
+                    },
                     notify: true
                 },
                 total: {
                     type: Object,
-                    computed: '_computeTotal(orderItems.*)'
+                    computed: '_computeTotal(orderItems.*)',
+                    notify: true
                 }
             },
 
